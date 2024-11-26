@@ -4,7 +4,7 @@ import json
 from discordrp import Presence
 import warnings
 import hashlib
-import logging  #ログの保存用ライブラリを追加
+import logging
 
 warnings.filterwarnings("ignore", category=ResourceWarning)
 
@@ -23,7 +23,7 @@ GITHUB_URL = "https://github.com/Fortniteleakjp/fortnitediscordstatus"
 
 APPNAME = "フォートナイト統計"
 
-#githubへのリンク用のはっしゅさくせい
+#githubへのリンク用のはっしゅ作成
 def generate_match_hash():
     return hashlib.md5(GITHUB_URL.encode()).hexdigest()
 
@@ -33,7 +33,7 @@ def save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, select
         "DISCORD_APP_ID": DISCORD_APP_ID,
         "FORTNITE_API_KEY": FORTNITE_API_KEY,
         "ACCOUNT_NAME": ACCOUNT_NAME,
-        "SELECTED_STATS": selected_stats  #ユーザーが選択した統計も保存
+        "SELECTED_STATS": selected_stats
     }
     try:
         with open('settings.json', 'w', encoding='utf-8') as json_file:
@@ -113,7 +113,6 @@ def update_discord_presence(stats, presence, start_time, remaining_time, selecte
         average_kills = kills / matches if matches > 0 else 0
 
         state = APPNAME
-        #ユーザーの選択に基づいてdetailsを作成
         details = ""
         if '1' in selected_stats:
             details += f"総キル数: {kills} | "
