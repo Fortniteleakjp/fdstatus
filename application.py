@@ -28,12 +28,13 @@ def generate_match_hash():
     return hashlib.md5(GITHUB_URL.encode()).hexdigest()
 
 #ユーザー設定をJSONファイルに保存
-def save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats):
+def save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats, IMAGE_KEY):
     settings = {
         "DISCORD_APP_ID": DISCORD_APP_ID,
         "FORTNITE_API_KEY": FORTNITE_API_KEY,
         "ACCOUNT_NAME": ACCOUNT_NAME,
-        "SELECTED_STATS": selected_stats
+        "SELECTED_STATS": selected_stats,
+        "IMAGE_KEY": IMAGE_KEY  # 画像キーを追加
     }
     try:
         with open('settings.json', 'w', encoding='utf-8') as json_file:
@@ -50,6 +51,11 @@ def log_user_input(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stat
         logging.info(f"選択された統計: {', '.join(selected_stats)}")
     except Exception as e:
         logging.error(f"ユーザー入力ログ記録エラー: {e}")
+
+def get_image_key():
+    print(f"{YELLOW}Discordステータスに表示する画像のキーを入力してください: {RESET}")
+    image_key = input(f"{GREEN}画像キー: {RESET}")
+    return image_key
 
 #設定をJSONファイルから読み込む
 def load_settings_from_json():
@@ -153,33 +159,38 @@ def main():
         settings = load_settings_from_json()
 
         if settings:
-            #設定が存在する場合、「設定ファイルから自動で読み込みますか？」と確認
-            print(f"{YELLOW}設定ファイルが見つかりました。設定を自動で読み込みますか？ (y/n){RESET}", end="")
-            choice = input().strip().lower()
+            # 設定ファイルが見つかれば、画像キーをユーザーに入力してもらう
+            IMAGE_KEY = get_image_key()  # 画像キーをユーザー入力に変更
 
-            if choice == 'y':
-                #「y」が選ばれたら自動で読み込み
-                print(f"{YELLOW}設定が読み込まれました{RESET}")
-                print(f"{GREEN}アカウント名: {settings['ACCOUNT_NAME']}")
-                DISCORD_APP_ID = settings['DISCORD_APP_ID']
-                FORTNITE_API_KEY = settings['FORTNITE_API_KEY']
-                ACCOUNT_NAME = settings['ACCOUNT_NAME']
-                selected_stats = settings['SELECTED_STATS']  #設定ファイルから選択された統計をロード
-            elif choice == 'n':
-                #「n」が選ばれたら新たに入力
-                print(f"{YELLOW}新たに設定を入力してください。{RESET}")
-                print(f"{GREEN}DiscordアプリケーションIDを入力してください: {RESET}", end="")
-                DISCORD_APP_ID = input()
-                print(f"{GREEN}APIキーを入力してください: {RESET}", end="")
-                FORTNITE_API_KEY = input()
-                print(f"{GREEN}アカウント名を入力してください: {RESET}", end="")
-                ACCOUNT_NAME = input()
+            # 以下、以前のコードをそのまま使用...
+            if settings:
+                # 設定が存在する場合、「設定ファイルから自動で読み込みますか？」と確認
+                print(f"{YELLOW}設定ファイルが見つかりました。設定を自動で読み込みますか？ (y/n){RESET}", end="")
+                choice = input().strip().lower()
 
-                #ユーザー設定を保存
-                selected_stats = get_user_stat_choices()
-                save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats)
-                log_user_input(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats)
-                print(f"{YELLOW}設定が保存されました{RESET}")
+                if choice == 'y':
+                    # 「y」が選ばれたら自動で読み込み
+                    print(f"{YELLOW}設定が読み込まれました{RESET}")
+                    print(f"{GREEN}アカウント名: {settings['ACCOUNT_NAME']}")
+                    DISCORD_APP_ID = settings['DISCORD_APP_ID']
+                    FORTNITE_API_KEY = settings['FORTNITE_API_KEY']
+                    ACCOUNT_NAME = settings['ACCOUNT_NAME']
+                    selected_stats = settings['SELECTED_STATS']  # 設定ファイルから選択された統計をロード
+                elif choice == 'n':
+                    # 「n」が選ばれたら新たに入力
+                    print(f"{YELLOW}新たに設定を入力してください。{RESET}")
+                    print(f"{GREEN}DiscordアプリケーションIDを入力してください: {RESET}", end="")
+                    DISCORD_APP_ID = input()
+                    print(f"{GREEN}APIキーを入力してください: {RESET}", end="")
+                    FORTNITE_API_KEY = input()
+                    print(f"{GREEN}アカウント名を入力してください: {RESET}", end="")
+                    ACCOUNT_NAME = input()
+
+                    # ユーザー設定を保存
+                    selected_stats = get_user_stat_choices()
+                    save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats, IMAGE_KEY)  # IMAGE_KEYを渡す
+                    log_user_input(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats)
+                    print(f"{YELLOW}設定が保存されました{RESET}")
             else:
                 print(f"{RED}無効な選択です。終了します。{RESET}")
                 return
@@ -190,12 +201,13 @@ def main():
             ACCOUNT_NAME = input(f"{GREEN}アカウント名を入力してください: {RESET}")
             selected_stats = get_user_stat_choices()
 
-            #ユーザー設定を保存
-            save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats)
+            # ユーザー設定を保存
+            IMAGE_KEY = get_image_key()  # 画像キーをユーザーに入力させる
+            save_settings_to_json(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats, IMAGE_KEY)  # IMAGE_KEYを渡す
             log_user_input(DISCORD_APP_ID, FORTNITE_API_KEY, ACCOUNT_NAME, selected_stats)
             print(f"{YELLOW}設定が保存されました{RESET}")
 
-        #データの更新間隔は60秒に固定
+        # データの更新間隔は60秒に固定
         UPDATE_INTERVAL = 60
         print(f"{YELLOW}データは{UPDATE_INTERVAL}秒ごとに更新されます{RESET}")
 
